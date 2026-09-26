@@ -1,92 +1,104 @@
 import { Easing } from "remotion";
 
+import { move, type Rect } from "../../../kit/move";
 import { step } from "../../../kit/spring";
 import { clamp01, progress } from "../../../kit/time";
-import { color, font, ui } from "../../../tokens";
+import { color, font, radius, ui } from "../../../tokens";
 import { cue } from "../cues";
-import { action, main } from "../layout";
-import { Button, swap } from "../ui/Button";
-import { Spinner } from "../ui/Spinner";
+import { swap } from "../ui/Button";
 
-/** Category scores for BRK-2041, consistent with the rule check (one drawing warning). */
-const CATEGORIES = [
-  { name: "Geometry", value: 100 },
-  { name: "Metadata", value: 100 },
-  { name: "Drawing", value: 83 },
-  { name: "Naming", value: 100 },
+/**
+ * Bars 9 and 10: the grouped PDF report, laid out like ca_reporter.py (navy
+ * banners, PASSED / FAILED score boxes, "~ ISSUES FOUND", the Change Action
+ * contents, action items). Numbers are the live run's: CA-00001445,
+ * PASS 35 / FAIL 12. On bar 10 beat 4 the page folds into an attachment on
+ * the route task (a magic move).
+ */
+export const page: Rect = { x: 650, y: 96, w: 620, h: 888 };
+export const attachment: Rect = { x: 460, y: 468, w: 600, h: 72 };
+const PARTS = [
+  { id: "1011548", type: "Part + Drawing", pass: 14, fail: 7 },
+  { id: "1011549", type: "Part + Drawing", pass: 13, fail: 5 },
+  { id: "1006311", type: "Part", pass: 8, fail: 0 },
 ] as const;
-const SCORE = 96;
-export const exportButton = action(240);
-const ring = { cx: main.x + 250, cy: main.y + 400, r: 170, stroke: 22 };
 const count = Easing.bezier(0.25, 0.1, 0.25, 1);
 
-/** Bars 9 and 10: the compliance score counts up, category bars fill on the beat, the report exports. */
-export function Report({ t, to }: { t: number; to: number }) {
-  if (t > to + 0.14) return null;
-  const leave = clamp01((t - to) / 0.12);
-  const u = count(progress(t, cue.score.from, cue.score.to - cue.score.from));
-  const score = Math.round(SCORE * u);
-  const circumference = 2 * Math.PI * ring.r;
-  const exporting = t >= cue.score.export && t < cue.score.exported;
-  const barsX = main.x + 620;
-  const barsW = main.w - 620;
+function Banner({ y, children }: { y: number; children: string }) {
+  return <div style={{ position: "absolute", left: 28, right: 28, top: y, height: 34, background: color.reportNavy, color: "#FFFFFF", fontSize: 15, fontWeight: 700, letterSpacing: "0.04em", display: "flex", alignItems: "center", paddingLeft: 14 }}>{children}</div>;
+}
+
+export function Report({ t }: { t: number }) {
+  const { report } = cue;
+  if (t < report.in || t > report.shrink + 1.2) return null;
+  const enter = clamp01(step(t - report.in, ui));
+  const rect = move(t, report.shrink, page, attachment);
+  const folding = clamp01((t - report.shrink) / 0.2);
+  const k = count(progress(t, report.count, report.countEnd - report.count));
+  // Once it has landed, the route task's own attachment row takes over.
+  if (t > report.shrink + 0.5) return null;
   return (
-    <div style={{ position: "absolute", inset: 0, opacity: 1 - leave, filter: leave > 0 ? `blur(${leave * 10}px)` : undefined }}>
-      <div style={{ position: "absolute", left: main.x, top: main.y, fontSize: 38, fontWeight: 600, letterSpacing: "-0.02em" }}>Compliance report</div>
-      <div style={{ position: "absolute", left: main.x, top: main.y + 56, fontFamily: font.mono, fontSize: 22, color: color.muted }}>BRK-2041 · Rev B · 6 design rules</div>
-      <Button box={exportButton} t={t} press={cue.score.export} target="export">
-        {exporting ? (
-          <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Spinner t={t} size={26} tint={color.accentInk} /> Exporting
-          </span>
-        ) : t >= cue.score.exported ? (
-          <span style={swap(t, cue.score.exported)}>Exported</span>
-        ) : (
-          "Export PDF"
-        )}
-      </Button>
-
-      <svg style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }} width={1} height={1}>
-        <circle cx={ring.cx} cy={ring.cy} r={ring.r} fill="none" stroke={color.border} strokeWidth={ring.stroke} />
-        <circle
-          cx={ring.cx}
-          cy={ring.cy}
-          r={ring.r}
-          fill="none"
-          stroke={color.accent}
-          strokeWidth={ring.stroke}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - (SCORE / 100) * u)}
-          transform={`rotate(-90 ${ring.cx} ${ring.cy})`}
-          opacity={u > 0 ? 1 : 0}
-        />
-      </svg>
-      <div style={{ position: "absolute", left: ring.cx - 200, top: ring.cy - 70, width: 400, display: "flex", justifyContent: "center", alignItems: "baseline", fontVariantNumeric: "tabular-nums" }}>
-        <span style={{ fontSize: 112, fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1 }}>{score}</span>
-        <span style={{ fontSize: 48, color: color.muted, marginLeft: 4 }}>%</span>
-      </div>
-      <div style={{ position: "absolute", left: ring.cx - 200, top: ring.cy + 58, width: 400, textAlign: "center", fontSize: 24, color: color.muted }}>Compliance score</div>
-
-      {CATEGORIES.map((category, index) => {
-        const at = cue.score.bars[index];
-        const fill = clamp01(step(t - at, ui));
-        const tint = category.value < 100 ? color.warn : color.accent;
-        const y = main.y + 190 + index * 118;
-        return (
-          <div key={category.name} style={{ position: "absolute", left: barsX, top: y, width: barsW, opacity: swap(t, at - 0.25).opacity }}>
-            <div style={{ display: "flex", fontSize: 26 }}>
-              <span>{category.name}</span>
-              <span style={{ marginLeft: "auto", fontFamily: font.mono, fontSize: 24, color: fill > 0.02 ? tint : color.muted, fontVariantNumeric: "tabular-nums" }}>
-                {Math.round(category.value * fill)}%
-              </span>
-            </div>
-            <div style={{ marginTop: 16, height: 10, borderRadius: 5, background: color.border }}>
-              <div style={{ height: 10, borderRadius: 5, background: tint, width: `${category.value * fill}%` }} />
-            </div>
+    <div style={{ position: "absolute", left: rect.x, top: rect.y, width: rect.w, height: rect.h, borderRadius: 4 + 8 * folding, background: color.paper, overflow: "hidden", opacity: enter, translate: `0 ${(1 - enter) * 40}px`, fontFamily: font.sans, color: color.text }}>
+      <div style={{ position: "absolute", left: 0, top: 0, width: page.w, height: page.h, opacity: 1 - folding }}>
+        <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 96, background: color.reportNavy, color: "#FFFFFF", padding: "20px 28px", boxSizing: "border-box" }}>
+          <div style={{ fontSize: 25, fontWeight: 700 }}>VerifAI Automated Inspection Report</div>
+          <div style={{ fontFamily: font.mono, fontSize: 15, color: "#C9D3E3", marginTop: 8 }}>CA-00001445 · 3 parts · 2 drawings</div>
+        </div>
+        <Banner y={122}>GENERAL ASSESSMENT</Banner>
+        {[
+          { label: "PASSED", value: 35, ink: color.pass, fill: color.passBg, x: 28 },
+          { label: "FAILED", value: 12, ink: color.fail, fill: color.failBg, x: 318 },
+        ].map((box) => (
+          <div key={box.label} style={{ position: "absolute", left: box.x, top: 172, width: 274, height: 140, background: box.fill, display: "grid", placeItems: "center", alignContent: "center", gap: 2 }}>
+            <div style={{ fontSize: 76, fontWeight: 700, color: box.ink, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{Math.round(box.value * k)}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: box.ink, letterSpacing: "0.08em" }}>{box.label}</div>
           </div>
-        );
-      })}
+        ))}
+        <div style={{ position: "absolute", left: 28, top: 334, ...swap(t, report.verdict) }}>
+          <span style={{ display: "inline-block", padding: "8px 18px", borderRadius: radius.pill, background: color.partial, color: "#FFFFFF", fontSize: 20, fontWeight: 700 }}>~ ISSUES FOUND</span>
+        </div>
+        <Banner y={400}>CHANGE ACTION CONTENTS</Banner>
+        <div style={{ position: "absolute", left: 28, right: 28, top: 446, fontSize: 15 }}>
+          <div style={{ display: "flex", color: color.textMuted, fontWeight: 600, paddingBottom: 8, borderBottom: `1px solid ${color.line}` }}>
+            <span style={{ width: 150 }}>Part</span>
+            <span style={{ width: 170 }}>Type</span>
+            <span style={{ width: 70 }}>Pass</span>
+            <span style={{ width: 70 }}>Fail</span>
+            <span>Result</span>
+          </div>
+          {PARTS.map((part, index) => (
+            <div key={part.id} style={{ display: "flex", alignItems: "center", height: 44, borderBottom: `1px solid ${color.lineSoft}`, fontSize: 17, ...swap(t, report.count + index * 0.25) }}>
+              <span style={{ width: 150, fontFamily: font.mono }}>{part.id}</span>
+              <span style={{ width: 170, color: color.textMuted }}>{part.type}</span>
+              <span style={{ width: 70, color: color.pass, fontWeight: 600 }}>{part.pass}</span>
+              <span style={{ width: 70, color: part.fail ? color.fail : color.textMuted, fontWeight: 600 }}>{part.fail}</span>
+              <span style={{ fontWeight: 700, color: part.fail ? color.fail : color.pass }}>{part.fail ? "FAIL" : "PASS"}</span>
+            </div>
+          ))}
+        </div>
+        <Banner y={640}>ACTION ITEMS</Banner>
+        <div style={{ position: "absolute", left: 28, right: 28, top: 690, fontSize: 17, display: "grid", gap: 14, ...swap(t, report.actions) }}>
+          <div>
+            <span style={{ fontFamily: font.mono }}>1011548</span> · Title Block Approvals <span style={{ color: color.fail, fontWeight: 700 }}>Major</span>
+          </div>
+          <div>
+            <span style={{ fontFamily: font.mono }}>1011548</span> · General Tolerance Standard <span style={{ color: color.fail, fontWeight: 700 }}>Major</span>
+          </div>
+        </div>
+        <div style={{ position: "absolute", left: 28, bottom: 22, fontSize: 13, color: color.textMuted }}>VerifAI · CA-00001445 · Auto-generated report.</div>
+      </div>
+      <div style={{ position: "absolute", inset: 0, opacity: folding }}>
+        <AttachmentRow />
+      </div>
+    </div>
+  );
+}
+
+/** The report as a route-task attachment. Also rendered by the task card once the move lands. */
+export function AttachmentRow() {
+  return (
+    <div style={{ width: attachment.w, height: attachment.h, display: "flex", alignItems: "center", gap: 16, padding: "0 18px", boxSizing: "border-box", borderRadius: 12, border: `2px solid ${color.line}`, background: color.paperAlt }}>
+      <span style={{ width: 40, height: 48, borderRadius: 4, background: color.fail, color: "#FFFFFF", fontSize: 12, fontWeight: 700, display: "grid", placeItems: "center" }}>PDF</span>
+      <span style={{ fontFamily: font.mono, fontSize: 20, color: color.text }}>VerifAI_Report_CA-00001445.pdf</span>
     </div>
   );
 }

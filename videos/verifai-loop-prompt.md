@@ -1,23 +1,23 @@
 <context>
-Verifai checks CAD and PLM data (parts, metadata, drawings) against design rules with AI, explains what failed, and gates release.
+VerifAI checks CAD models and technical drawings in 3DEXPERIENCE with AI and catches design errors before production. The robot inspects and reports; the engineer decides.
 This film plays on the landing page as a muted loop. It must read with the sound off.
 Read `videos/BRAND.md` first. This prompt only adds the story.
 </context>
 
 <inputs>
-Decided: 1920x1080, 60 fps (240 fps master with motion blur), dark, 15 bars at 120 BPM, 30 s. Music: silent.
+Decided: 1920x1080, 60 fps (240 fps master with motion blur), dark ground with the product's light surfaces, 15 bars at 120 BPM, 30 s. Music: silent.
 </inputs>
 
 <direction>
-Calm, exact, engineering-grade. Every beat something resolves.
-Ingredients: logo draws itself · punchlines word by word · one magic move plus blur swaps on bars · user cursor.
-Banned: glows, particles, bouncy easing, invented surfaces, partner logos, release without a person approving.
+Calm, exact, engineering-grade. The robot works on its own; the person makes the call.
+Ingredients: logo builds itself · punchlines word by word · blur swaps on bars, one magic move (report → attachment) · one cursor, the engineer's.
+Banned: glows, particles, bouncy easing, invented surfaces, customer logos, auto-release to production.
 </direction>
 
 <cast>
-- The Verifai mark: opening, and again for the ending lockup.
-- Cursor: the user's OS arrow.
-- Demo world: part BRK-2041 "Bracket, rear mount", Rev B; rule MP-DR-012 (hole ≥ 3.0 mm); HOLE-04 at 2.5 mm; change CA-0142; design lead "DL".
+- The VerifAI mark: opening, the Change Action pickup, the inspection read-out, the task comment, the lockup.
+- Cursor: the engineer's OS arrow, only on the route task.
+- Demo world: CA-00001445 (1011548, 1011549, 1006311), drawing 1011548 Rev A 1:2, PASS 35 / FAIL 12.
 </cast>
 
 <structure>

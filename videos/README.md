@@ -1,6 +1,6 @@
-# Verifai films
+# VerifAI films
 
-Product films for Verifai, made with the [product-film skill](https://github.com/Rieranthony/product-film-skill) and Remotion.
+Product films for VerifAI (MetaPLM), made with the [product-film skill](https://github.com/Rieranthony/product-film-skill) and Remotion.
 
 - `BRAND.md`: the video kit (brief, colors, type, claims).
 - `verifai-loop-prompt.md`, `beat-sheet.md`: the 30 s landing loop.

@@ -11,27 +11,24 @@ export const BARS = 15;
 export const DURATION = b(BARS + 1);
 
 export const cue = {
-  // Bar 1: the mark draws itself, the wordmark lands on sixteenths.
-  open: { hex: b(1, 1, 0.1), check: b(1, 2), fill: b(1, 3), word: b(1, 2), out: b(2) - 0.2 },
+  // Bar 1: the four corner blocks snap in, the check draws, the wordmark lands.
+  open: { corners: [b(1, 1, 0.1), b(1, 1, 0.5), b(1, 2), b(1, 2, 0.5)], check: b(1, 3), word: b(1, 2, 0.5), out: b(2) - 0.2 },
   // Bar 2: punchline.
-  punch1: { words: [b(2, 1), b(2, 2), b(2, 3), b(2, 4)], out: b(3) - 0.12 },
-  // Bars 3 to 5: automated rule check.
-  window1: { in: b(3), out: b(8) - 0.12 },
-  run: { click: b(3, 4), done: b(5, 3) },
-  rules: [b(4, 1), b(4, 2), b(4, 3), b(4, 4), b(5, 1), b(5, 2)],
-  openIssue: b(5, 4),
-  // Bars 6 and 7: the issue in detail, the suggested fix.
-  detail: { in: b(6), facts: b(6, 2), fixWords: b(6, 3), apply: b(7, 2), fixed: b(7, 3) },
+  punch1: { words: [b(2, 1), b(2, 2), b(2, 3), b(2, 3, 0.5)], out: b(3) - 0.12 },
+  // Bars 3 and 4: a Change Action reaches its approval route; VerifAI picks it up.
+  ca: { in: b(3), rows: [b(3, 1, 0.5), b(3, 2), b(3, 2, 0.5)], route: b(3, 3), pickup: b(3, 4), queued: [b(4, 1), b(4, 2), b(4, 3)], out: b(5) - 0.12 },
+  // Bars 5 to 7: the drawing is read and the rules resolve, one per beat.
+  inspect: { in: b(5), scan: b(5, 1, 0.5), rules: [b(5, 3), b(5, 4), b(6, 1), b(6, 2), b(6, 3), b(6, 4), b(7, 1), b(7, 2)], authority: b(7, 3), out: b(8) - 0.12 },
   // Bar 8: punchline.
   punch2: { words: [b(8, 1), b(8, 2), b(8, 3)], out: b(9) - 0.12 },
-  // Bars 9 and 10: compliance report.
-  window2: { in: b(9), out: b(13) - 0.12 },
-  score: { from: b(9, 1, 0.5), to: b(9, 4), bars: [b(9, 3), b(9, 4), b(10, 1), b(10, 2)], export: b(10, 3), exported: b(10, 4) },
-  // Bars 11 and 12: release route, human approval, released on the strongest beat.
-  route: { in: b(11), send: b(11, 2), sent: b(11, 3), approved: b(12, 1), released: b(12, 3) },
-  // Bars 13 and 14: the promise, then the lockup.
+  // Bars 9 and 10: the report.
+  report: { in: b(9), count: b(9, 2), countEnd: b(9, 4), verdict: b(10, 1), actions: b(10, 2), shrink: b(10, 4) },
+  // Bars 11 and 12: the engineer decides on the route task.
+  task: { in: b(10, 4), comment: b(11, 1), decide: b(11, 4), reject: b(12, 1), returned: b(12, 2), out: b(13) - 0.12 },
+  // Bar 13: the promise.
   punch3: { words: [b(13, 1), b(13, 2), b(13, 3)], out: b(14) - 0.12 },
-  close: { hex: b(14, 1), check: b(14, 2), fill: b(14, 3), word: b(14, 1, 0.5) },
+  // Bar 14: the lockup, then "by MetaPLM".
+  close: { corners: [b(14, 1), b(14, 1, 0.25), b(14, 1, 0.5), b(14, 1, 0.75)], check: b(14, 2), word: b(14, 1, 0.5), by: b(14, 3) },
   // Bar 15: the loop folds back to the empty first frame.
-  fold: { word: b(15, 1), fill: b(15, 2), check: b(15, 3), hex: b(15, 3, 0.5), end: DURATION - 0.1 },
+  fold: { by: b(15, 1), word: b(15, 1, 0.5), check: b(15, 3), corners: b(15, 3, 0.5), end: DURATION - 0.1 },
 } as const;

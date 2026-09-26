@@ -1,28 +1,45 @@
 /**
- * Verifai tokens. There is no product design system yet, so these are the
- * film's defaults (see videos/BRAND.md): dark and technical, one green
- * "verified" accent, status tones for pass / warn / fail. Hex only, because
- * anything that animates goes through interpolateColors.
+ * VerifAI tokens, taken from the product's own sources:
+ * - brand blue, navy, light blue and neutrals: the VerifAI logo page (direction 1b, "Denetim mührü")
+ * - sky accent and header gradient: metachecker-widget src/plugins/vuetify.js, app.vue
+ * - PASS / FAIL / SKIP / partial and the report navy: metachecker-mvp ca_reporter.py
+ * - agent colors: metachecker-widget ChecklistList.vue
+ * Hex only, because anything that animates goes through interpolateColors.
  */
 export const color = {
-  bg: "#0a0b0d",
-  surface: "#111418",
-  raised: "#171b21",
-  border: "#242a33",
-  fg: "#f2f5f8",
-  muted: "#8a93a0",
-  accent: "#34e2a0",
-  accentInk: "#04130d",
-  fail: "#ff5c5c",
-  warn: "#f4b740",
+  // Film ground: the logo's dark test background.
+  bg: "#0B1620",
+  onBg: "#FFFFFF",
+  onBgMuted: "#98A1AE",
+  brand: "#0E5A8A",
+  brandLight: "#4A85B9",
+  sky: "#1F93CE",
+  // Product surfaces (light, as in the widget and the report).
+  paper: "#FFFFFF",
+  paperAlt: "#F7F8FA",
+  line: "#DDE1E8",
+  lineSoft: "#EDEFF3",
+  text: "#0B1620",
+  textMuted: "#6E7785",
+  headerFrom: "#012F4D",
+  headerMid: "#015686",
+  reportNavy: "#1A2744",
+  pass: "#27AE60",
+  passBg: "#EAF7EF",
+  fail: "#C0392B",
+  failBg: "#FDECEA",
+  skip: "#95A5A6",
+  partial: "#E67E22",
 } as const;
+
+export const agentColor = { "2D": "#3949AB", "3D": "#546E7A", PLM: "#2E7D32", CROSS: "#EF6C00" } as const;
 
 export const font = {
   sans: '"Inter", sans-serif',
   mono: '"JetBrains Mono", monospace',
 } as const;
 
-export const radius = { window: 20, control: 12, pill: 999 } as const;
+export const radius = { window: 14, control: 8, pill: 999 } as const;
 
 /** UI springs: quick and settled, no bounce. */
 export const ui = { stiffness: 220, damping: 26 } as const;
