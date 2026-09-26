@@ -1,0 +1,27 @@
+{
+  "name": "verifai-videos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "stills": "bun scripts/stills.ts",
+    "render": "bun scripts/render.ts VerifaiLoop verifai-loop --duration 30 --poster 27.6 --silent",
+    "postinstall": "sh scripts/copy-fonts.sh",
+    "beat-sheet": "bun scripts/beat-sheet.ts"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.529",
+    "@remotion/cli": "4.0.529",
+    "@remotion/fonts": "4.0.529",
+    "@remotion/renderer": "4.0.529",
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
