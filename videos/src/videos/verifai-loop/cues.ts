@@ -12,7 +12,7 @@ export const DURATION = b(BARS + 1);
 
 export const cue = {
   // Bar 1: the corner blocks close in from the frame's corners onto the mark, the check draws, the wordmark lands.
-  open: { corners: [b(1, 1, 0.1), b(1, 1, 0.6)], check: b(1, 3, 0.2), word: b(1, 3), step: 0.08, out: b(2) - 0.2 },
+  open: { corners: [b(1, 1, 0.1), b(1, 1, 0.1)], check: b(1, 2, 0.2), word: b(1, 2, 0.5), step: 0.08, out: b(2) - 0.2 },
   // Bar 2: punchline.
   punch1: { words: [b(2, 1), b(2, 2), b(2, 3), b(2, 3, 0.5)], out: b(3) - 0.12 },
   // Bars 3 and 4: the route task is picked up; the CATIA worker opens the 3D model.

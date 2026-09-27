@@ -55,12 +55,19 @@ In code the product is still called MetaChecker; films say **VerifAI**.
 | Report | navy banners, PASSED / FAILED boxes, "~ ISSUES FOUND", CA contents, action items | ca_reporter.py |
 
 ## Engineering look (v3)
-- Ground: a drafting grid (24 px minor, 120 px major with node crosses, edge rulers), static so the loop's first and last frames match.
-- HUD during product scenes: numbered section (01 INTAKE · 3D MODEL, 02 2D DRAWING, 03 REPORT, 04 DECISION), CA id, running timecode. Mono, muted.
-- The mark's corner blocks are the film's framing device: the opening viewfinder, the drawing viewport's corners, and the target lock on each failure.
-- 3D: the part as a wireframe projected per frame from the drawing's dimensions, a section plane, an XYZ triad (X red, Y green, Z sky), a 360 dimension.
-- 2D: a camera on the sheet (push in on each failure, pull back), the rule run printed like a test run (`$ verifai inspect 1011548 --rev A`, 01..08, PASS / FAIL).
+- Ground: a drafting grid (24 px minor, 120 px major with node crosses), static so the loop's first and last frames match. No edge rulers, no HUD corner labels, no frame borders (studio rules).
+- The mark's corner blocks carry the film: they fly in from outside the frame and slam onto the mark (the hook), and they lock onto each failure on the drawing.
+- 3D: the part as a wireframe projected per frame from the drawing's dimensions, a section plane, an XYZ triad, a 360 dimension; the CATIA checks type out as a log, then "✓ 3D PASS" stamps.
+- 2D: a camera on the sheet (push in on each failure, pull back); the rule run printed like a test run (`$ verifai inspect 1011548 --rev A`, 01..08, PASS / FAIL); failures tagged "FAIL · MAJOR" at phone-readable size.
+- Report: the page prints (slides out of a slot), and its two numbers are called out at 260 px on the film ground.
+- Decision: the engineer rejects; the route draws back to "DESIGN".
 - Punchlines carry a mono spec line above and a drafting dimension below (CA-00001445, 140 s / CHANGE ACTION, BEFORE RELEASE).
+- One accent: `#4A85B9`. PASS / FAIL greens and reds are semantic, not accents.
+
+## Sound
+- Synthesized in code (`scripts/score.py`): kick / snare / hats on the 120 BPM grid, a 16th-note bass, a pad, and SFX on cue times (hook impact, rule PASS blips and FAIL buzzes, target locks, report counter ticks, reject and return hits, lockup impact). Seeded noise.
+- Sounds past the end wrap to the start, so the audio loops seamlessly.
+- -14 LUFS integrated, peak under -1 dBFS. Beat grid measured back from the drum stem with `scripts/beats.py` (120.005 BPM, spread 1.7 ms).
 
 ## Motion
 - UI spring stiffness 220, damping 26; pops 320 / 22; magic move 150 / 20.

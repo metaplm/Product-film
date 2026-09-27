@@ -9,14 +9,13 @@ export const HEADER = 84;
 
 /**
  * A light product card with the widget's header gradient (metachecker-widget
- * app.vue). Enters with a short rise and blur, leaves with a blur. Children are
+ * app.vue). Wipes open from the left, leaves with a blur. Children are
  * placed in the card's own coordinates.
  */
 export function Panel({ t, box, from, to, header, children, target }: { t: number; box: Box; from: number; to: number; header: ReactNode; children: ReactNode; target?: string }) {
   if (t < from || t > to + 0.14) return null;
   const enter = step(t - from, ui);
   const leave = clamp01((t - to) / 0.12);
-  const u = clamp01(enter) * (1 - leave);
   return (
     <div
       data-target={target}
@@ -29,14 +28,14 @@ export function Panel({ t, box, from, to, header, children, target }: { t: numbe
         borderRadius: radius.window,
         background: color.paper,
         overflow: "hidden",
-        opacity: u,
-        translate: `0 ${(1 - enter) * 24}px`,
-        filter: u < 0.98 ? `blur(${(1 - u) * 12}px)` : undefined,
+        clipPath: `inset(0 ${(1 - clamp01(enter)) * 100}% 0 0 round ${radius.window}px)`,
+        opacity: 1 - leave,
+        filter: leave > 0 ? `blur(${leave * 12}px)` : undefined,
         fontFamily: font.sans,
         color: color.text,
       }}
     >
-      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: HEADER, background: `linear-gradient(125deg, ${color.headerFrom}, ${color.headerMid} 52%, ${color.sky} 130%)`, display: "flex", alignItems: "center", gap: 18, padding: "0 32px", color: color.onBg }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: HEADER, background: `linear-gradient(125deg, ${color.headerFrom}, ${color.headerMid})`, display: "flex", alignItems: "center", gap: 18, padding: "0 32px", color: color.onBg }}>
         {header}
       </div>
       {children}

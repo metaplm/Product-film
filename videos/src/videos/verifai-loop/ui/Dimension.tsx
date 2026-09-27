@@ -23,7 +23,7 @@ export function Dimension({ t, a }: { t: number; a: Annotation }) {
     <div style={{ position: "absolute", inset: 0, opacity: 1 - leave, filter: leave > 0 ? `blur(${leave * 10}px)` : undefined }}>
       <div style={{ position: "absolute", left: 0, right: 0, top: a.specY, textAlign: "center", fontFamily: font.mono, fontSize: 22, letterSpacing: "0.14em", color: "#6F8499", opacity: spec, translate: `0 ${(1 - spec) * 10}px` }}>{a.spec}</div>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
-        <g stroke={color.sky} strokeWidth={2} fill={color.sky}>
+        <g stroke={color.accent} strokeWidth={2} fill={color.accent}>
           <line x1={a.x1} y1={a.y - 22} x2={a.x1} y2={a.y + 12} opacity={grow > 0.98 ? 1 : 0} />
           <line x1={a.x2} y1={a.y - 22} x2={a.x2} y2={a.y + 12} opacity={grow > 0.98 ? 1 : 0} />
           {half > gap / 2 ? (
@@ -35,7 +35,7 @@ export function Dimension({ t, a }: { t: number; a: Annotation }) {
           ) : null}
         </g>
       </svg>
-      <div style={{ position: "absolute", left: mid - 300, width: 600, top: a.y - 15, textAlign: "center", fontFamily: font.mono, fontSize: 24, color: color.sky, opacity: label }}>{a.value}</div>
+      <div style={{ position: "absolute", left: mid - 300, width: 600, top: a.y - 15, textAlign: "center", fontFamily: font.mono, fontSize: 24, color: color.accent, opacity: label }}>{a.value}</div>
     </div>
   );
 }

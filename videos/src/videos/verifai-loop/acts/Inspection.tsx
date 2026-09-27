@@ -71,7 +71,7 @@ export function Inspection({ t }: { t: number }) {
       <div style={{ position: "absolute", left: VIEW.x, top: VIEW.y, width: VIEW.w, height: VIEW.h, overflow: "hidden" }}>
         <div style={{ position: "absolute", left: origin.x - VIEW.x, top: origin.y - VIEW.y, width: SHEET.w, height: SHEET.h, scale: String(cam.zoom), transformOrigin: "0 0" }}>
           <Drawing />
-          {scan > 0 && scan < 1 ? <div style={{ position: "absolute", left: 0, right: 0, top: scan * SHEET.h - 60, height: 60, background: "linear-gradient(180deg, #1F93CE00, #1F93CE38)", borderBottom: `2px solid ${color.sky}` }} /> : null}
+          {scan > 0 && scan < 1 ? <div style={{ position: "absolute", left: 0, right: 0, top: scan * SHEET.h - 60, height: 60, background: "linear-gradient(180deg, #4A85B900, #4A85B938)", borderBottom: `2px solid ${color.accent}` }} /> : null}
           {RULES.map((rule, index) => {
             if (!rule.box || t < inspect.rules[index]) return null;
             const [x, y, w, h] = rule.box;
@@ -107,8 +107,6 @@ export function Inspection({ t }: { t: number }) {
           })}
         </div>
       </div>
-      {/* Viewport marks: the logo's corner blocks, at the frame of the lens. */}
-      <ViewCorners box={VIEW} size={34} tint="#2A4A66" />
 
       {/* Target lock on each failure, in screen space so it follows the camera exactly. */}
       {FOCUS.map((focus) => {
@@ -122,41 +120,41 @@ export function Inspection({ t }: { t: number }) {
         const failed = t >= inspect.rules[focus.rule];
         return (
           <div key={focus.rule} style={{ position: "absolute", inset: 0, opacity: clamp01(lock * 2) * (1 - clamp01((t - (focus.to - 0.12)) / 0.12)) }}>
-            <ViewCorners box={box} size={30} tint={failed ? color.fail : color.sky} weight={6} />
-            <div style={{ position: "absolute", left: box.x, top: box.y + box.h + 16, display: "flex", gap: 12, alignItems: "center", fontFamily: font.mono, fontSize: 22, ...(failed ? swap(t, inspect.rules[focus.rule]) : { opacity: 0 }) }}>
-              <span style={{ background: color.fail, color: "#FFFFFF", padding: "4px 12px", fontWeight: 500 }}>FAIL · MAJOR</span>
-              <span style={{ background: color.bg, color: color.onBg, padding: "4px 12px" }}>{focus.label}</span>
+            <ViewCorners box={box} size={30} tint={failed ? color.fail : color.accent} weight={6} />
+            <div style={{ position: "absolute", left: Math.max(VIEW.x, box.x), top: Math.min(box.y + box.h + 16, VIEW.y + VIEW.h - 110), display: "grid", gap: 0, justifyItems: "start", fontFamily: font.mono, fontSize: 34, ...(failed ? swap(t, inspect.rules[focus.rule]) : { opacity: 0 }) }}>
+              <span style={{ background: color.fail, color: "#FFFFFF", padding: "6px 16px", fontWeight: 500, fontSize: 44 }}>FAIL · MAJOR</span>
+              <span style={{ background: color.bg, color: color.onBg, padding: "6px 16px" }}>{focus.label}</span>
             </div>
           </div>
         );
       })}
 
       <div style={{ position: "absolute", left: panel.x, top: panel.y, width: panel.w, color: color.onBg, fontFamily: font.mono }}>
-        <div style={{ fontSize: 24, height: 34, color: color.sky }}>
+        <div style={{ fontSize: 24, height: 34, color: color.accent }}>
           {COMMAND.slice(0, typed)}
           <span style={{ opacity: typed < COMMAND.length || Math.floor(t * 4) % 2 ? 1 : 0 }}>▍</span>
         </div>
-        <div style={{ fontSize: 20, color: color.onBgMuted, marginTop: 10 }}>drawing · 3D model · PLM card</div>
         <div style={{ display: "flex", gap: 6, marginTop: 24, alignItems: "center" }}>
           {RULES.map((_, index) => {
             const s = states[index].state;
             return <span key={index} style={{ width: 44, height: 14, background: s === "pass" ? color.pass : s === "fail" ? color.fail : "#1C2C3B" }} />;
           })}
-          <span style={{ marginLeft: 14, fontSize: 22 }}>
-            {String(done).padStart(2, "0")}/08
+          <span style={{ marginLeft: 16, fontSize: 44, fontWeight: 500 }}>
+            {String(done).padStart(2, "0")}
+            <span style={{ color: color.onBgMuted }}>/08</span>
           </span>
         </div>
         <div style={{ marginTop: 20 }}>
           {RULES.map((rule, index) => {
             const { state } = states[index];
             return (
-              <div key={rule.name} style={{ height: 72, display: "flex", alignItems: "center", gap: 14, borderTop: "1px solid #1C2C3B" }}>
-                <span style={{ fontSize: 18, color: color.onBgMuted, width: 26 }}>{String(index + 1).padStart(2, "0")}</span>
-                <span style={{ fontFamily: font.sans, fontSize: 21, lineHeight: 1.2, flex: 1, color: state === "idle" ? color.onBgMuted : color.onBg }}>{rule.name}</span>
+              <div key={rule.name} style={{ height: 76, display: "flex", alignItems: "center", gap: 14, borderTop: "1px solid #1C2C3B" }}>
+                <span style={{ fontSize: 20, color: color.onBgMuted, width: 28 }}>{String(index + 1).padStart(2, "0")}</span>
+                <span style={{ fontFamily: font.sans, fontSize: 24, lineHeight: 1.15, flex: 1, color: state === "idle" ? color.onBgMuted : color.onBg }}>{rule.name}</span>
                 <span style={{ fontSize: 14, color: agentColor[rule.agent] === agentColor.CROSS ? "#F29A4A" : "#8FA6BC", width: 58, textAlign: "right" }}>{rule.agent}</span>
-                <span style={{ width: 66, textAlign: "right", fontSize: 21, fontWeight: 500 }}>
+                <span style={{ width: 80, textAlign: "right", fontSize: 26, fontWeight: 500 }}>
                   {state === "checking" ? (
-                    <Spinner t={t} size={24} tint={color.sky} track="#1C2C3B" />
+                    <Spinner t={t} size={24} tint={color.accent} track="#1C2C3B" />
                   ) : state === "idle" ? (
                     <span style={{ color: "#2A3B4C" }}>····</span>
                   ) : (

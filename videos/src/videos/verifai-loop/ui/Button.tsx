@@ -29,7 +29,7 @@ export function Button({ box, fill, ink, border, t, press, children, target }: {
         color: ink,
         fontFamily: font.sans,
         fontWeight: 600,
-        fontSize: 24,
+        fontSize: Math.min(34, box.h * 0.36),
         scale: String(1 - dip),
       }}
     >

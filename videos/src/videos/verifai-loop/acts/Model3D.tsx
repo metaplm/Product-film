@@ -4,7 +4,6 @@ import { step } from "../../../kit/spring";
 import { clamp01, progress } from "../../../kit/time";
 import { color, font, ui } from "../../../tokens";
 import { cue } from "../cues";
-import { swap } from "../ui/Button";
 import { Mark } from "../ui/Mark";
 
 /**
@@ -52,7 +51,7 @@ const EDGES: Edge[] = [
   ...[0, T].flatMap((z) => [...ring(-120, 0, 20, z), ...ring(120, 0, 20, z), ...slot(0, 0, 20, 20, z)]),
 ];
 
-const CENTER = { x: 1210, y: 560 };
+const CENTER = { x: 1270, y: 560 };
 const SCALE = 1.45;
 const PITCH = (32 * Math.PI) / 180;
 
@@ -62,17 +61,35 @@ function project([x, y, z]: P, yaw: number) {
   return { x: CENTER.x + x1 * SCALE, y: CENTER.y - (z * Math.cos(PITCH) + y1 * Math.sin(PITCH)) * SCALE, depth: y1 * Math.cos(PITCH) - z * Math.sin(PITCH) };
 }
 
-const LINES: { at: number; text: React.ReactNode }[] = [
-  { at: cue.model.lines[0], text: <>ROUTE TASK <b>Approve</b></> },
-  { at: cue.model.lines[1], text: <>CA-00001445 · 3 PP · 2 DRW</> },
-  { at: cue.model.lines[2], text: <span style={{ color: color.sky }}>› picked up by VerifAI</span> },
-  { at: cue.model.lines[3], text: <>CATIA WORKER · 1011548.CATPart</> },
-  { at: cue.model.lines[4], text: <>› open model ··········· ok</> },
-  { at: cue.model.lines[5], text: <>bodies ···················· 1</> },
-  { at: cue.model.lines[6], text: <>hidden bodies ········ 0 <span style={{ color: color.pass }}>PASS</span></> },
-  { at: cue.model.lines[7], text: <>visible sketches ····· 0 <span style={{ color: color.pass }}>PASS</span></> },
-  { at: cue.model.lines[8], text: <>iso capture ··· 1011548_iso.jpg</> },
+/** Log lines, typed out (plain text so they can type; a trailing PASS is tinted). */
+const LINES: { at: number; text: string; tint?: string }[] = [
+  { at: cue.model.lines[0], text: "CA-00001445", tint: color.onBgMuted },
+  { at: cue.model.lines[2], text: "› picked up", tint: color.accent },
+  { at: cue.model.lines[3], text: "1011548.CATPart" },
+  { at: cue.model.lines[5], text: "bodies ······· 1" },
+  { at: cue.model.lines[6], text: "hidden ······· 0 PASS" },
+  { at: cue.model.lines[7], text: "sketches ····· 0 PASS" },
 ];
+const TYPE = 0.012;
+
+function Typed({ t, at, text, tint }: { t: number; at: number; text: string; tint?: string }) {
+  const count = Math.max(0, Math.min(text.length, Math.floor((t - at) / TYPE)));
+  const shown = text.slice(0, count);
+  const pass = shown.endsWith("PASS") ? shown.length - 4 : -1;
+  return (
+    <span style={{ color: tint }}>
+      {pass > 0 ? (
+        <>
+          {shown.slice(0, pass)}
+          <span style={{ color: color.pass }}>PASS</span>
+        </>
+      ) : (
+        shown
+      )}
+      {count > 0 && count < text.length ? <span style={{ color: color.accent }}>▍</span> : null}
+    </span>
+  );
+}
 
 export function Model3D({ t }: { t: number }) {
   const { model } = cue;
@@ -94,7 +111,7 @@ export function Model3D({ t }: { t: number }) {
   const plane = scanning ? ([[scanX, -140, -170], [scanX, 140, -170], [scanX, 140, 50], [scanX, -140, 50]] as const).map((v) => project(v, yaw)) : null;
   const dimA = project([-180, -120 - 50, 0], yaw);
   const dimB = project([180, -120 - 50, 0], yaw);
-  const axes = ([[70, 0, 0, "#E5675A", "X"], [0, 70, 0, color.pass, "Y"], [0, 0, 70, color.sky, "Z"]] as const).map(([x, y, z, tint, name]) => {
+  const axes = ([[70, 0, 0, "#E5675A", "X"], [0, 70, 0, color.pass, "Y"], [0, 0, 70, color.accent, "Z"]] as const).map(([x, y, z, tint, name]) => {
     const o = { x: 1640, y: 900 };
     const x1 = x * Math.cos(yaw) - y * Math.sin(yaw);
     const y1 = x * Math.sin(yaw) + y * Math.cos(yaw);
@@ -104,13 +121,13 @@ export function Model3D({ t }: { t: number }) {
   return (
     <div style={{ position: "absolute", inset: 0, opacity: u, filter: u < 0.98 ? `blur(${(1 - u) * 12}px)` : undefined }}>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
-        {plane ? <path d={`M${plane.map((p) => `${p.x} ${p.y}`).join(" L")} Z`} fill="#1F93CE1F" stroke={color.sky} strokeWidth={1.5} /> : null}
+        {plane ? <path d={`M${plane.map((p) => `${p.x} ${p.y}`).join(" L")} Z`} fill="#4A85B91F" stroke={color.accent} strokeWidth={1.5} /> : null}
         <g strokeLinecap="round">
           {segs.map(({ p, q, near }, index) => {
             const k = index / segs.length;
             if (k > draw) return null;
             const cut = scanning && Math.abs(((p.x + q.x) / 2 - project([scanX, 0, 0], yaw).x)) < 26;
-            return <line key={index} x1={p.x} y1={p.y} x2={q.x} y2={q.y} stroke={cut ? color.sky : color.onBg} strokeOpacity={0.45 + 0.5 * clamp01(0.5 - near / 400)} strokeWidth={cut ? 3 : 1.8} />;
+            return <line key={index} x1={p.x} y1={p.y} x2={q.x} y2={q.y} stroke={cut ? color.accent : color.onBg} strokeOpacity={0.45 + 0.5 * clamp01(0.5 - near / 400)} strokeWidth={cut ? 3 : 1.8} />;
           })}
         </g>
         <g stroke={color.onBgMuted} strokeWidth={1.2} fill={color.onBgMuted} opacity={draw}>
@@ -126,23 +143,29 @@ export function Model3D({ t }: { t: number }) {
           </g>
         ))}
       </svg>
-      <div style={{ position: "absolute", left: 1480, top: 214, fontFamily: font.mono, fontSize: 18, color: "#6F8499", lineHeight: 1.6, textAlign: "right", width: 340 }}>
+      <div style={{ position: "absolute", left: 1420, top: 150, fontFamily: font.mono, fontSize: 24, color: "#6F8499", lineHeight: 1.6, textAlign: "right", width: 440 }}>
         <div>1011548 · REV A</div>
         <div>YAW {((yaw * 180) / Math.PI).toFixed(1)}°</div>
         <div>{scanning ? `SECTION X = ${scanX.toFixed(0)} mm` : "SECTION —"}</div>
       </div>
 
-      <div style={{ position: "absolute", left: 100, top: 214, width: 600, fontFamily: font.mono, fontSize: 24, color: color.onBg }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 26 }}>
-          <Mark size={40} check={clamp01((t - model.lines[2]) / 0.3)} />
-          <span style={{ fontFamily: font.sans, fontSize: 30, fontWeight: 600 }}>Intake · 3D model</span>
+      <div style={{ position: "absolute", left: 90, top: 150, width: 640, fontFamily: font.mono, fontSize: 42, color: color.onBg }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
+          <Mark size={52} check={clamp01((t - model.lines[2]) / 0.3)} />
+          <span style={{ fontFamily: font.sans, fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em" }}>3D model</span>
         </div>
         {LINES.map((line, index) => (
-          <div key={index} style={{ height: 50, whiteSpace: "nowrap", color: index < 2 ? color.onBgMuted : color.onBg, ...(t >= line.at ? swap(t, line.at) : { opacity: 0 }) }}>
-            {line.text}
+          <div key={index} style={{ height: 76, whiteSpace: "nowrap" }}>
+            <Typed t={t} at={line.at} text={line.text} tint={line.tint} />
           </div>
         ))}
       </div>
+      {/* The verdict, big enough to read on a phone: a stamp, not a fade. */}
+      {t >= model.lines[8] + 0.2 ? (
+        <div style={{ position: "absolute", left: 90, top: 820, fontFamily: font.mono, fontSize: 88, fontWeight: 500, color: color.pass, scale: String(1.25 - 0.25 * clamp01(step(t - model.lines[8] - 0.2, { stiffness: 400, damping: 28 }))), transformOrigin: "0 50%" }}>
+          ✓ 3D PASS
+        </div>
+      ) : null}
     </div>
   );
 }

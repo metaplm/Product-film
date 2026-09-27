@@ -1,4 +1,4 @@
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, Audio, staticFile } from "remotion";
 
 import { cursorAt, UserCursor, type CursorKey } from "../../kit/cursor";
 import { TargetLog } from "../../kit/debug";
@@ -11,7 +11,7 @@ import { Model3D } from "./acts/Model3D";
 import { Report } from "./acts/Report";
 import { RouteTask, reject, taskBox } from "./acts/RouteTask";
 import { b, cue } from "./cues";
-import { Blueprint, Hud } from "./ui/Blueprint";
+import { Blueprint } from "./ui/Blueprint";
 import { Dimension, type Annotation } from "./ui/Dimension";
 
 export type FilmProps = { fps: number; debug: boolean };
@@ -64,19 +64,8 @@ export function VerifaiLoop({ debug }: FilmProps) {
   const shown = cursorShown(t);
   return (
     <AbsoluteFill style={{ background: color.bg, fontFamily: font.sans, color: color.onBg }}>
+      <Audio src={staticFile("audio/verifai-loop/score.wav")} />
       <Blueprint />
-      <Hud
-        t={t}
-        from={cue.model.in}
-        to={cue.task.out}
-        sections={[
-          [cue.model.in, "01 / INTAKE · 3D MODEL"],
-          [cue.inspect.in, "02 / 2D DRAWING"],
-          [cue.punch2.words[0], "—"],
-          [cue.report.in, "03 / REPORT"],
-          [cue.task.comment, "04 / DECISION"],
-        ]}
-      />
       <Model3D t={t} />
       <Inspection t={t} />
       <RouteTask t={t} />

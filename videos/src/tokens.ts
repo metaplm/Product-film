@@ -1,7 +1,7 @@
 /**
  * VerifAI tokens, taken from the product's own sources:
  * - brand blue, navy, light blue and neutrals: the VerifAI logo page (direction 1b, "Denetim mührü")
- * - sky accent and header gradient: metachecker-widget src/plugins/vuetify.js, app.vue
+ * - header gradient: metachecker-widget app.vue (its sky end dropped: the film keeps one accent)
  * - PASS / FAIL / SKIP / partial and the report navy: metachecker-mvp ca_reporter.py
  * - agent colors: metachecker-widget ChecklistList.vue
  * Hex only, because anything that animates goes through interpolateColors.
@@ -13,7 +13,8 @@ export const color = {
   onBgMuted: "#98A1AE",
   brand: "#0E5A8A",
   brandLight: "#4A85B9",
-  sky: "#1F93CE",
+  /** The film's one accent (the logo's "AI" on dark). */
+  accent: "#4A85B9",
   // Product surfaces (light, as in the widget and the report).
   paper: "#FFFFFF",
   paperAlt: "#F7F8FA",
