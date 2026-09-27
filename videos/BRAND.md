@@ -54,6 +54,14 @@ In code the product is still called MetaChecker; films say **VerifAI**.
 | Rule names | `name_en` from checklist.yaml, with the agent chip | checklist.yaml, ChecklistList.vue |
 | Report | navy banners, PASSED / FAILED boxes, "~ ISSUES FOUND", CA contents, action items | ca_reporter.py |
 
+## Engineering look (v3)
+- Ground: a drafting grid (24 px minor, 120 px major with node crosses, edge rulers), static so the loop's first and last frames match.
+- HUD during product scenes: numbered section (01 INTAKE · 3D MODEL, 02 2D DRAWING, 03 REPORT, 04 DECISION), CA id, running timecode. Mono, muted.
+- The mark's corner blocks are the film's framing device: the opening viewfinder, the drawing viewport's corners, and the target lock on each failure.
+- 3D: the part as a wireframe projected per frame from the drawing's dimensions, a section plane, an XYZ triad (X red, Y green, Z sky), a 360 dimension.
+- 2D: a camera on the sheet (push in on each failure, pull back), the rule run printed like a test run (`$ verifai inspect 1011548 --rev A`, 01..08, PASS / FAIL).
+- Punchlines carry a mono spec line above and a drafting dimension below (CA-00001445, 140 s / CHANGE ACTION, BEFORE RELEASE).
+
 ## Motion
 - UI spring stiffness 220, damping 26; pops 320 / 22; magic move 150 / 20.
 - Punchline words: blur 16 px, rise 36 px, 0.3 s on `cubic-bezier(0.22, 1, 0.36, 1)`.
